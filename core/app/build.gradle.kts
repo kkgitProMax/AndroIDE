@@ -82,8 +82,8 @@ android {
 
   defaultConfig {
     // Get version info from github action
-    val baseVersion = project.property("baseVersion") as? String ?: "1.0.0"
-    val versionSuffix = project.property("versionSuffix") as? String ?: ""
+    val baseVersion = project.findProperty("baseVersion") as? String ?: "1.0.0"
+    val versionSuffix = project.findProperty("versionSuffix") as? String ?: ""
     versionName = "${baseVersion}${versionSuffix}"
     
     applicationId = BuildConfig.packageName
