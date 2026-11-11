@@ -82,30 +82,19 @@ jobs:
         run: |
           chmod +x gradlew
 
-      - name: Debug what we actually built
-        working-directory: ${{ env.ANDROID_DIR }}
-        run: |
-          echo "=== remote ==="
-          git remote -v
-          echo "=== last commit ==="
-          git log -1 --oneline
-          echo "=== branch ==="
-          git branch -a
-          echo "=== baseVersion 出现在哪 ==="
-          grep -rn "baseVersion" --include="*.gradle.kts" --include="*.properties" . | head -20
-          echo "=== 是否存在根级 app 模块 ==="
-          ls -d app core/app 2>/dev/null
-
       - name: Build ${{ matrix.build_type }} APK
         working-directory: ${{ env.ANDROID_DIR }}
         run: |
           build_type=${{ matrix.build_type }}
-          ./gradlew assemble${build_type^}
+          ./gradlew :core:app:assemble${build_type^} \
+            -PversionSuffix="suf-" \
+            -PbaseVersion="v001-"
+
 
       - name: Show APK Path
         working-directory: ${{ env.ANDROID_DIR }}
         run: |
-          apk_dir="./app/build/outputs/apk/${{ matrix.build_type }}"
+          apk_dir="./core/app/build/outputs/apk/${{ matrix.build_type }}"
           echo ">>${apk_dir}:"
           ls -la "${apk_dir}" || echo "(no APK outputs)"
 
@@ -113,7 +102,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: apk-${{ matrix.build_type }}-${{ steps.set_sha.outputs.short_sha }}
-          path: ${{ env.ANDROID_DIR }}/app/build/outputs/apk/${{ matrix.build_type }}/*.apk
+          path: ${{ env.ANDROID_DIR }}/core/app/build/outputs/apk/${{ matrix.build_type }}/*.apk
           retention-days: 7
           ### 设置保存天数，节省github存储配额，默认90
           if-no-files-found: error
