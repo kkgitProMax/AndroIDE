@@ -41,9 +41,11 @@ jobs:
         with:
           access_token: ${{ github.token }}
 
-      - name: Checkout Code
-        uses: actions/checkout@v7
+      - name: Clone Project
+        uses: actions/checkout@v4
         with:
+          repository: ${{ steps.get-project.outputs.PROJECT }}
+          path: ${{ env.ANDROID_DIR }}
           submodules: recursive
           fetch-depth: 1
 
