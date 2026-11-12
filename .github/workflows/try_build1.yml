@@ -8,18 +8,6 @@ name: Build Current Repo
 ### To build from subfolder,just modify the 'ANDROID_DIR'
 
 on:
-  push:
-    branches: [ "main","master" ]
-    ### Start build only on these branches
-    paths-ignore:
-      - '**.md'
-      - '.github/workflows/*.yml'
-
-  #pull_request:
-  ### 在 PR 时触发，用于验证（如 Dependabot 的 PR）
-    #branches: [ "main","master" ]
-    ### Start build only on these branches
-
   workflow_dispatch: { }
   ### Support manual build in 'Actions/workflow'
 
