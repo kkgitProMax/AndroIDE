@@ -1,13 +1,6 @@
 name: Build APK
 
 on:
-  push:
-    #branches: [ "master", "main" ]
-    paths-ignore:
-      - '**.md'
-      - 'RELEASE_INFO'
-      - 'fastlane/**'
-      - '.github/workflows/*.yml'
   workflow_dispatch: {}
 
 # Cancel old runs
