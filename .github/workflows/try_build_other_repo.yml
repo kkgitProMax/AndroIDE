@@ -36,15 +36,31 @@ jobs:
     timeout-minutes: 30
 
     steps:
+
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.13.1
         with:
           access_token: ${{ github.token }}
 
-      - name: Clone Project
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          repository: ${{ steps.get-project.outputs.PROJECT }}
+          fetch-depth: 1
+
+      ### 读 project-to-build，并把完整 URL 规范化为 owner/repo
+      - id: get-project
+        name: Get Project Name
+        run: |
+          RAW=$(cat project-to-build | tr -d '\r\n')
+          REPO=$(echo "$RAW" | sed -E 's#^https?://github\.com/##; s#\.git$##')
+          echo "raw=$RAW" >> $GITHUB_OUTPUT
+          echo "REPO=$REPO" >> $GITHUB_OUTPUT
+
+      ### checkout 目标仓库到 ANDROID_DIR，带 submodules
+      - name: Clone Target Project
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.get-project.outputs.REPO }}
           path: ${{ env.ANDROID_DIR }}
           submodules: recursive
           fetch-depth: 1
@@ -58,15 +74,6 @@ jobs:
         with:
           java-version: 17
           distribution: 'temurin'
-
-      - id: get-project
-        name: Get Project Name
-        run: echo "PROJECT=$(cat project-to-build | tr -d '\r\n')" >> $GITHUB_OUTPUT
-        ### 清理可能存在的回车换行符
-
-      - name: Clone Project
-        run: git clone --depth=1 ${{ steps.get-project.outputs.PROJECT }} ${{ env.ANDROID_DIR }}
-        ### 把远程仓库克隆到ANDROID_DIR目录下
 
       - name: Configure Gradle Memory
         working-directory: ${{ env.ANDROID_DIR }}
